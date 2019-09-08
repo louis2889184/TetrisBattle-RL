@@ -6,12 +6,14 @@ import torch
 from gym.spaces.box import Box
 
 from baselines import bench
-from baselines.common.atari_wrappers import make_atari, wrap_deepmind
+from baselines.common.atari_wrappers import make_atari, wrap_deepmind, NoopResetEnv, MaxAndSkipEnv, WarpFrame
 from baselines.common.vec_env import VecEnvWrapper
 from baselines.common.vec_env.dummy_vec_env import DummyVecEnv
 from baselines.common.vec_env.shmem_vec_env import ShmemVecEnv
 from baselines.common.vec_env.vec_normalize import \
     VecNormalize as VecNormalize_
+
+from TetrisBattle.tetris_single_env import TetrisSingleEnv
 
 try:
     import dm_control2gym
@@ -29,11 +31,14 @@ except ImportError:
     pass
 
 
-def make_env(env_id, seed, rank, log_dir, allow_early_resets):
+def make_env(env_id, seed, rank, log_dir, allow_early_resets, mode):
     def _thunk():
         if env_id.startswith("dm"):
             _, domain, task = env_id.split('.')
             env = dm_control2gym.make(domain_name=domain, task_name=task)
+
+        elif env_id == "tetris_single":
+            env = TetrisSingleEnv(obs_type="image", mode=mode)
         else:
             env = gym.make(env_id)
 
@@ -55,9 +60,16 @@ def make_env(env_id, seed, rank, log_dir, allow_early_resets):
                 os.path.join(log_dir, str(rank)),
                 allow_early_resets=allow_early_resets)
 
+    
         if is_atari:
             if len(env.observation_space.shape) == 3:
                 env = wrap_deepmind(env)
+        elif env_id.startswith("tetris"):
+            # env = wrap_deepmind(env, episode_life=False, clip_rewards=False, frame_stack=False, scale=False)
+            # env = NoopResetEnv(env, noop_max=30)
+            env = MaxAndSkipEnv(env, skip=8)
+            # pass
+            env = WarpFrame(env, 224, 224)
         elif len(env.observation_space.shape) == 3:
             raise NotImplementedError(
                 "CNN models work only for atari,\n"
@@ -81,9 +93,10 @@ def make_vec_envs(env_name,
                   log_dir,
                   device,
                   allow_early_resets,
-                  num_frame_stack=None):
+                  num_frame_stack=None,
+                  mode='rgb_array'):
     envs = [
-        make_env(env_name, seed, i, log_dir, allow_early_resets)
+        make_env(env_name, seed, i, log_dir, allow_early_resets, mode)
         for i in range(num_processes)
     ]
 
@@ -143,7 +156,7 @@ class TransposeImage(TransposeObs):
         Transpose observation space for images
         """
         super(TransposeImage, self).__init__(env)
-        assert len(op) == 3, "Error: Operation, " + str(op) + ", must be dim3"
+        assert len(op) == 3, f"Error: Operation, {str(op)}, must be dim3"
         self.op = op
         obs_shape = self.observation_space.shape
         self.observation_space = Box(

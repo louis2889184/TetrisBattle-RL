@@ -149,6 +149,19 @@ def get_args():
         action='store_true',
         default=False,
         help='use a linear schedule on the learning rate')
+
+    parser.add_argument(
+        '--grid',
+        action='store_true',
+        default=False,
+        help='use grid feature for tetris battle, or use image'
+    )
+    parser.add_argument(
+        '--gpu',
+        type=int,
+        default=0,
+        help='use which gpu'
+    )
     args = parser.parse_args()
 
     args.cuda = not args.no_cuda and torch.cuda.is_available()

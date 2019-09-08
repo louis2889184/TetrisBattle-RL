@@ -25,6 +25,9 @@ class Policy(nn.Module):
             else:
                 raise NotImplementedError
 
+        elif base == "grid":
+            base = GridBase
+
         self.base = base(obs_shape[0], **base_kwargs)
 
         if action_space.__class__.__name__ == "Discrete":
@@ -173,11 +176,18 @@ class CNNBase(NNBase):
         init_ = lambda m: init(m, nn.init.orthogonal_, lambda x: nn.init.
                                constant_(x, 0), nn.init.calculate_gain('relu'))
 
+        # self.main = nn.Sequential(
+        #     init_(nn.Conv2d(num_inputs, 32, 8, stride=4)), nn.ReLU(),
+        #     init_(nn.Conv2d(32, 64, 4, stride=2)), nn.ReLU(),
+        #     init_(nn.Conv2d(64, 32, 3, stride=1)), nn.ReLU(), Flatten(),
+        #     init_(nn.Linear(32 * 7 * 7, hidden_size)), nn.ReLU())
+
         self.main = nn.Sequential(
             init_(nn.Conv2d(num_inputs, 32, 8, stride=4)), nn.ReLU(),
             init_(nn.Conv2d(32, 64, 4, stride=2)), nn.ReLU(),
-            init_(nn.Conv2d(64, 32, 3, stride=1)), nn.ReLU(), Flatten(),
-            init_(nn.Linear(32 * 7 * 7, hidden_size)), nn.ReLU())
+            init_(nn.Conv2d(64, 64, 3, stride=2)), nn.ReLU(),
+            init_(nn.Conv2d(64, 32, 3, stride=2)), nn.ReLU(), Flatten(),
+            init_(nn.Linear(32 * 5 * 5, hidden_size)), nn.ReLU())
 
         init_ = lambda m: init(m, nn.init.orthogonal_, lambda x: nn.init.
                                constant_(x, 0))
@@ -187,6 +197,7 @@ class CNNBase(NNBase):
         self.train()
 
     def forward(self, inputs, rnn_hxs, masks):
+        # print(inputs.shape)
         x = self.main(inputs / 255.0)
 
         if self.is_recurrent:
@@ -227,3 +238,32 @@ class MLPBase(NNBase):
         hidden_actor = self.actor(x)
 
         return self.critic_linear(hidden_critic), hidden_actor, rnn_hxs
+
+class GridBase(NNBase):
+    def __init__(self, num_inputs, recurrent=False, hidden_size=32):
+        super(GridBase, self).__init__(recurrent, hidden_size, hidden_size)
+
+        init_ = lambda m: init(m, nn.init.orthogonal_, lambda x: nn.init.
+                               constant_(x, 0), nn.init.calculate_gain('relu'))
+
+        self.main = nn.Sequential(
+            init_(nn.Conv2d(num_inputs, 32, 3, stride=2, padding=(0, 5))), nn.ReLU(),
+            init_(nn.Conv2d(32, 64, 3, stride=2)), nn.ReLU(),
+            init_(nn.Conv2d(64, 32, 3, stride=2)), nn.ReLU(), Flatten(),
+            init_(nn.Linear(32, hidden_size)), nn.ReLU())
+
+        init_ = lambda m: init(m, nn.init.orthogonal_, lambda x: nn.init.
+                               constant_(x, 0))
+
+        self.critic_linear = init_(nn.Linear(hidden_size, 1))
+
+        self.train()
+
+    def forward(self, inputs, rnn_hxs, masks):
+        x = self.main(inputs / 255.0)
+
+        if self.is_recurrent:
+            x, rnn_hxs = self._forward_gru(x, rnn_hxs, masks)
+
+        return self.critic_linear(x), x, rnn_hxs
+

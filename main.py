@@ -2,7 +2,10 @@ import copy
 import glob
 import os
 import time
+import random
 from collections import deque
+
+from PIL import Image
 
 import gym
 import numpy as np
@@ -18,6 +21,18 @@ from a2c_ppo_acktr.envs import make_vec_envs
 from a2c_ppo_acktr.model import Policy
 from a2c_ppo_acktr.storage import RolloutStorage
 from evaluation import evaluate
+
+def exploration_rate(now_game, method='exp'):
+    eps_start = 1.0
+    eps_end = 0.05
+    eps_decay = 2000
+    if method == 'exp':
+
+        return eps_end + (eps_start - eps_end) * np.exp(-1.0 * float(now_game) / eps_decay)
+    elif method == 'tanh':
+        offset = 3.0 * eps_decay
+        return eps_end + (eps_start - eps_end) * \
+                (1.0 - np.tanh((float(now_game) - offset) / eps_decay)) / 2.0
 
 
 def main():
@@ -36,14 +51,15 @@ def main():
     utils.cleanup_log_dir(eval_log_dir)
 
     torch.set_num_threads(1)
-    device = torch.device("cuda:0" if args.cuda else "cpu")
+    device = torch.device("cuda:%d" % args.gpu if args.cuda else "cpu")
 
     envs = make_vec_envs(args.env_name, args.seed, args.num_processes,
-                         args.gamma, args.log_dir, device, False)
+                         args.gamma, args.log_dir, device, False, 4)
 
     actor_critic = Policy(
         envs.observation_space.shape,
         envs.action_space,
+        base="grid" if args.grid else None,
         base_kwargs={'recurrent': args.recurrent_policy})
     actor_critic.to(device)
 
@@ -98,8 +114,11 @@ def main():
     episode_rewards = deque(maxlen=10)
 
     start = time.time()
+    kk = 0
     num_updates = int(
         args.num_env_steps) // args.num_steps // args.num_processes
+    # learning_start = 1000
+    learning_start = 0
     for j in range(num_updates):
 
         if args.use_linear_lr_decay:
@@ -108,6 +127,8 @@ def main():
                 agent.optimizer, j, num_updates,
                 agent.optimizer.lr if args.algo == "acktr" else args.lr)
 
+        explore = exploration_rate(j - learning_start, 'exp')
+
         for step in range(args.num_steps):
             # Sample actions
             with torch.no_grad():
@@ -115,12 +136,37 @@ def main():
                     rollouts.obs[step], rollouts.recurrent_hidden_states[step],
                     rollouts.masks[step])
 
-            # Obser reward and next obs
-            obs, reward, done, infos = envs.step(action)
+            # if j < learning_start:
+            #     action[0, 0] = random.randint(0, envs.action_space.n - 1)
+            # elif random.uniform(0, 1) < explore:
+            #     action[0, 0] = random.randint(0, envs.action_space.n - 1)
+            # else:
+            #     pass
 
+            # Obser reward and next obs
+            # action[0, 0] = 1
+            # envs.take_turns()
+            obs, reward, done, infos = envs.step(action)
+            # print(obs)
+            
+            # im = Image.fromarray(obs[0].reshape(224 * 4, -1).cpu().numpy().astype(np.uint8))
+            # im.save("samples/%d.png" % kk)
+            # info = infos[0]
+            # if len(info) > 0:
+            #     print(info)
+            # print(done)
+            # print(infos)
             for info in infos:
                 if 'episode' in info.keys():
                     episode_rewards.append(info['episode']['r'])
+            # kk += 1
+            # print(action.shape)
+            # print(obs.shape)
+            # print(done.shape)
+            # if done[0]:
+            #     print(time.time() - start)
+            #     print(kk)
+            #     exit()
 
             # If done then clean the history of observations.
             masks = torch.FloatTensor(
@@ -173,7 +219,11 @@ def main():
                 getattr(utils.get_vec_normalize(envs), 'ob_rms', None)
             ], os.path.join(save_path, args.env_name + ".pt"))
 
+        # print(episode_rewards)
+
         if j % args.log_interval == 0 and len(episode_rewards) > 1:
+            if j < learning_start:
+                print("random action")
             total_num_steps = (j + 1) * args.num_processes * args.num_steps
             end = time.time()
             print(

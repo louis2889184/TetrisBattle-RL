@@ -43,14 +43,17 @@ env = make_vec_envs(
     None,
     None,
     device='cpu',
-    allow_early_resets=False)
+    allow_early_resets=False,
+    mode="rgb_array")
 
 # Get a render function
 render_func = get_render_func(env)
 
 # We need to use the same statistics for normalization as used in training
 actor_critic, ob_rms = \
-            torch.load(os.path.join(args.load_dir, args.env_name + ".pt"))
+            torch.load(os.path.join(args.load_dir, args.env_name + ".pt"), map_location=lambda storage, loc: storage)
+
+actor_critic.eval()
 
 vec_norm = get_vec_normalize(env)
 if vec_norm is not None:
@@ -74,13 +77,37 @@ if args.env_name.find('Bullet') > -1:
         if (p.getBodyInfo(i)[0].decode() == "torso"):
             torsoId = i
 
+
+from PIL import Image
+i = 0
+import time
+
+start = time.time()
+
 while True:
     with torch.no_grad():
         value, action, _, recurrent_hidden_states = actor_critic.act(
             obs, recurrent_hidden_states, masks, deterministic=args.det)
 
     # Obser reward and next obs
+    # action[0, 0] = 1
     obs, reward, done, _ = env.step(action)
+    # print(obs)
+    # if action[0, 0] != 1:
+    #     break
+    # ob = obs[:, 3, :, :].squeeze().numpy().astype(np.uint8)
+    # # print(ob)
+    # # print(type(ob))
+    # im = Image.fromarray(ob)
+    # im.save("samples/%d.png" % i)
+    # i += 1
+
+    # print(action)
+
+    # if done:
+    #     print(time.time() - start)
+    #     print(i)
+    #     exit()
 
     masks.fill_(0.0 if done else 1.0)
 
