@@ -14,7 +14,7 @@ Due to above challenges, the training is not successful by directly applying the
 
 1. Clone the Tetris Battle:
 
-`https://github.com/louis2889184/TetrisBattle.git`
+`git clone https://github.com/louis2889184/TetrisBattle.git`
 
 2. TBD...
 
