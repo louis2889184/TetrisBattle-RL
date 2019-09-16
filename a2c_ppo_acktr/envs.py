@@ -31,14 +31,14 @@ except ImportError:
     pass
 
 
-def make_env(env_id, seed, rank, log_dir, allow_early_resets, mode):
+def make_env(env_id, seed, rank, log_dir, allow_early_resets, obs_type, mode):
     def _thunk():
         if env_id.startswith("dm"):
             _, domain, task = env_id.split('.')
             env = dm_control2gym.make(domain_name=domain, task_name=task)
 
         elif env_id == "tetris_single":
-            env = TetrisSingleEnv(obs_type="image", mode=mode)
+            env = TetrisSingleEnv(obs_type=obs_type, mode=mode)
         else:
             env = gym.make(env_id)
 
@@ -69,7 +69,8 @@ def make_env(env_id, seed, rank, log_dir, allow_early_resets, mode):
             # env = NoopResetEnv(env, noop_max=30)
             env = MaxAndSkipEnv(env, skip=8)
             # pass
-            env = WarpFrame(env, 224, 224)
+            if obs_type == "image":
+                env = WarpFrame(env, 224, 224)
         elif len(env.observation_space.shape) == 3:
             raise NotImplementedError(
                 "CNN models work only for atari,\n"
@@ -94,9 +95,10 @@ def make_vec_envs(env_name,
                   device,
                   allow_early_resets,
                   num_frame_stack=None,
+                  obs_type='image',
                   mode='rgb_array'):
     envs = [
-        make_env(env_name, seed, i, log_dir, allow_early_resets, mode)
+        make_env(env_name, seed, i, log_dir, allow_early_resets, obs_type, mode)
         for i in range(num_processes)
     ]
 

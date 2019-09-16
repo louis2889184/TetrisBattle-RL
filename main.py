@@ -50,11 +50,18 @@ def main():
     utils.cleanup_log_dir(log_dir)
     utils.cleanup_log_dir(eval_log_dir)
 
+    save_name = '%s_%s' % (args.env_name, args.algo)
+    if args.postfix != '':
+        save_name += ('_' + args.postfix)
+
+    logger_filename = os.path.join(log_dir, save_name)
+    logger = utils.create_logger(logger_filename)
+
     torch.set_num_threads(1)
     device = torch.device("cuda:%d" % args.gpu if args.cuda else "cpu")
 
     envs = make_vec_envs(args.env_name, args.seed, args.num_processes,
-                         args.gamma, args.log_dir, device, False, 4)
+                         args.gamma, args.log_dir, device, False, 4, obs_type="grid" if args.grid else "image")
 
     actor_critic = Policy(
         envs.observation_space.shape,
@@ -112,13 +119,14 @@ def main():
     rollouts.to(device)
 
     episode_rewards = deque(maxlen=10)
-
+    lines = deque(maxlen=10)
     start = time.time()
     kk = 0
     num_updates = int(
         args.num_env_steps) // args.num_steps // args.num_processes
     # learning_start = 1000
     learning_start = 0
+    best_reward = -100
     for j in range(num_updates):
 
         if args.use_linear_lr_decay:
@@ -159,6 +167,9 @@ def main():
             for info in infos:
                 if 'episode' in info.keys():
                     episode_rewards.append(info['episode']['r'])
+                if 'sent' in info.keys():
+                    lines.append(info['sent'])
+            
             # kk += 1
             # print(action.shape)
             # print(obs.shape)
@@ -207,27 +218,28 @@ def main():
 
         # save for every interval-th episode or for the last epoch
         if (j % args.save_interval == 0
-                or j == num_updates - 1) and args.save_dir != "":
+                or j == num_updates - 1) and args.save_dir != "" \
+                and np.mean(episode_rewards) > best_reward:
             save_path = os.path.join(args.save_dir, args.algo)
             try:
                 os.makedirs(save_path)
             except OSError:
                 pass
-
+            best_reward = np.mean(episode_rewards)
             torch.save([
                 actor_critic,
                 getattr(utils.get_vec_normalize(envs), 'ob_rms', None)
-            ], os.path.join(save_path, args.env_name + ".pt"))
+            ], os.path.join(save_path, save_name + ".pt"))
 
         # print(episode_rewards)
 
         if j % args.log_interval == 0 and len(episode_rewards) > 1:
             if j < learning_start:
-                print("random action")
+                logger.info("random action")
             total_num_steps = (j + 1) * args.num_processes * args.num_steps
             end = time.time()
-            print(
-                "Updates {}, num timesteps {}, FPS {} \n Last {} training episodes: mean/median reward {:.1f}/{:.1f}, min/max reward {:.1f}/{:.1f}\n"
+            logger.info(
+                "Updates {}, num timesteps {}, FPS {} \n Last {} training episodes: mean/median reward {:.1f}/{:.1f}, min/max reward {:.1f}/{:.1f}"
                 .format(j, total_num_steps,
                         int(total_num_steps / (end - start)),
                         len(episode_rewards), np.mean(episode_rewards),
@@ -235,6 +247,11 @@ def main():
                         np.max(episode_rewards), dist_entropy, value_loss,
                         action_loss))
 
+            logger.info(
+                ' lines sent: mean/median lines {:.1f}/{:.1f}, min/max lines {:.1f}/{:.1f}\n'
+                .format(np.mean(lines), np.median(lines), 
+                    np.min(lines), np.max(lines)))
+            
         if (args.eval_interval is not None and len(episode_rewards) > 1
                 and j % args.eval_interval == 0):
             ob_rms = utils.get_vec_normalize(envs).ob_rms

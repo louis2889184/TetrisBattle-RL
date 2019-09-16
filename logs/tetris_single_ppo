@@ -1,0 +1,104 @@
+Updates 0, num timesteps 4096, FPS 731 
+ Last 3 training episodes: mean/median reward -5.0/-5.0, min/max reward -5.0/-5.0
+ lines sent: mean/median lines 0.0/0.0, min/max lines 0.0/0.0
+
+Updates 1, num timesteps 8192, FPS 591 
+ Last 10 training episodes: mean/median reward -5.0/-5.0, min/max reward -5.0/-5.0
+ lines sent: mean/median lines 0.0/0.0, min/max lines 0.0/0.0
+
+Updates 2, num timesteps 12288, FPS 424 
+ Last 10 training episodes: mean/median reward -4.8/-5.0, min/max reward -5.0/-4.0
+ lines sent: mean/median lines 0.0/0.0, min/max lines 0.0/0.0
+
+Updates 3, num timesteps 16384, FPS 378 
+ Last 10 training episodes: mean/median reward -5.0/-5.0, min/max reward -5.0/-5.0
+ lines sent: mean/median lines 0.0/0.0, min/max lines 0.0/0.0
+
+Updates 4, num timesteps 20480, FPS 372 
+ Last 10 training episodes: mean/median reward -2.4/-2.5, min/max reward -5.0/1.0
+ lines sent: mean/median lines 0.0/0.0, min/max lines 0.0/0.0
+
+Updates 5, num timesteps 24576, FPS 346 
+ Last 10 training episodes: mean/median reward -3.0/-5.0, min/max reward -5.0/0.0
+ lines sent: mean/median lines 0.0/0.0, min/max lines 0.0/0.0
+
+Updates 6, num timesteps 28672, FPS 340 
+ Last 10 training episodes: mean/median reward -2.5/-2.5, min/max reward -5.0/0.0
+ lines sent: mean/median lines 0.0/0.0, min/max lines 0.0/0.0
+
+Updates 7, num timesteps 32768, FPS 333 
+ Last 10 training episodes: mean/median reward -1.5/0.0, min/max reward -5.0/0.0
+ lines sent: mean/median lines 0.0/0.0, min/max lines 0.0/0.0
+
+Updates 8, num timesteps 36864, FPS 327 
+ Last 10 training episodes: mean/median reward -3.0/-5.0, min/max reward -5.0/0.0
+ lines sent: mean/median lines 0.0/0.0, min/max lines 0.0/0.0
+
+Updates 9, num timesteps 40960, FPS 322 
+ Last 10 training episodes: mean/median reward -2.0/0.0, min/max reward -5.0/0.0
+ lines sent: mean/median lines 0.0/0.0, min/max lines 0.0/0.0
+
+Updates 10, num timesteps 45056, FPS 320 
+ Last 10 training episodes: mean/median reward -0.5/0.0, min/max reward -5.0/0.0
+ lines sent: mean/median lines 0.0/0.0, min/max lines 0.0/0.0
+
+Updates 11, num timesteps 49152, FPS 321 
+ Last 10 training episodes: mean/median reward -0.4/0.0, min/max reward -5.0/1.0
+ lines sent: mean/median lines 0.0/0.0, min/max lines 0.0/0.0
+
+Updates 12, num timesteps 53248, FPS 314 
+ Last 10 training episodes: mean/median reward -0.9/0.0, min/max reward -5.0/1.0
+ lines sent: mean/median lines 0.0/0.0, min/max lines 0.0/0.0
+
+Updates 13, num timesteps 57344, FPS 312 
+ Last 10 training episodes: mean/median reward 0.2/0.0, min/max reward 0.0/1.0
+ lines sent: mean/median lines 0.0/0.0, min/max lines 0.0/0.0
+
+Updates 14, num timesteps 61440, FPS 313 
+ Last 10 training episodes: mean/median reward -1.0/0.0, min/max reward -5.0/0.0
+ lines sent: mean/median lines 0.0/0.0, min/max lines 0.0/0.0
+
+Updates 15, num timesteps 65536, FPS 311 
+ Last 10 training episodes: mean/median reward 0.3/0.0, min/max reward 0.0/2.0
+ lines sent: mean/median lines 0.0/0.0, min/max lines 0.0/0.0
+
+Updates 16, num timesteps 69632, FPS 309 
+ Last 10 training episodes: mean/median reward -0.4/0.0, min/max reward -5.0/1.0
+ lines sent: mean/median lines 0.0/0.0, min/max lines 0.0/0.0
+
+Updates 17, num timesteps 73728, FPS 309 
+ Last 10 training episodes: mean/median reward -0.3/0.0, min/max reward -5.0/1.0
+ lines sent: mean/median lines 0.0/0.0, min/max lines 0.0/0.0
+
+Updates 18, num timesteps 77824, FPS 305 
+ Last 10 training episodes: mean/median reward -0.3/0.0, min/max reward -5.0/1.0
+ lines sent: mean/median lines 0.0/0.0, min/max lines 0.0/0.0
+
+Updates 19, num timesteps 81920, FPS 307 
+ Last 10 training episodes: mean/median reward 0.1/0.0, min/max reward 0.0/1.0
+ lines sent: mean/median lines 0.0/0.0, min/max lines 0.0/0.0
+
+Updates 20, num timesteps 86016, FPS 306 
+ Last 10 training episodes: mean/median reward 0.0/0.0, min/max reward 0.0/0.0
+ lines sent: mean/median lines 0.0/0.0, min/max lines 0.0/0.0
+
+Updates 21, num timesteps 90112, FPS 304 
+ Last 10 training episodes: mean/median reward 0.0/0.0, min/max reward 0.0/0.0
+ lines sent: mean/median lines 0.0/0.0, min/max lines 0.0/0.0
+
+Updates 22, num timesteps 94208, FPS 302 
+ Last 10 training episodes: mean/median reward 0.1/0.0, min/max reward 0.0/1.0
+ lines sent: mean/median lines 0.0/0.0, min/max lines 0.0/0.0
+
+Updates 23, num timesteps 98304, FPS 303 
+ Last 10 training episodes: mean/median reward 0.1/0.0, min/max reward 0.0/1.0
+ lines sent: mean/median lines 0.0/0.0, min/max lines 0.0/0.0
+
+Updates 24, num timesteps 102400, FPS 301 
+ Last 10 training episodes: mean/median reward 0.0/0.0, min/max reward 0.0/0.0
+ lines sent: mean/median lines 0.0/0.0, min/max lines 0.0/0.0
+
+Updates 25, num timesteps 106496, FPS 300 
+ Last 10 training episodes: mean/median reward 0.0/0.0, min/max reward 0.0/0.0
+ lines sent: mean/median lines 0.0/0.0, min/max lines 0.0/0.0
+

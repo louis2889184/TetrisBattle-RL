@@ -1,5 +1,6 @@
 import glob
 import os
+import logging
 
 import torch
 import torch.nn as nn
@@ -26,6 +27,26 @@ def get_vec_normalize(venv):
         return get_vec_normalize(venv.venv)
 
     return None
+
+def create_logger(file_name):
+    logger = logging.getLogger('my_logger')
+    logger.propagate = False
+    logger.setLevel(logging.DEBUG)
+
+    if not getattr(logger, 'handler_set', False):
+
+        cs = logging.StreamHandler()
+        cs.setLevel(logging.DEBUG)
+        logger.addHandler(cs)
+
+        fh = logging.FileHandler(file_name, mode='w')
+        fh.setLevel(logging.INFO)
+
+        logger.addHandler(fh)
+
+        logger.handler_set = True
+
+    return logger
 
 
 # Necessary for my KFAC implementation.

@@ -162,6 +162,10 @@ def get_args():
         default=0,
         help='use which gpu'
     )
+    parser.add_argument(
+        '--postfix',
+        type=str,
+        default='')
     args = parser.parse_args()
 
     args.cuda = not args.no_cuda and torch.cuda.is_available()
