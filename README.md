@@ -10,6 +10,14 @@ Due to above challenges, the training is not successful by directly applying the
 1. Use observations with smaller dimension (the hidden grid of the game). <br/> 
 2. Reduce choices of the Tetriminos (which is blocks in Tetris).
 
+The score in Tetris Battle is called "line sent", and it is computed as following. <br/>
+
+1. line sents = number of cleared line - 1.
+2. line sents = 4 if you clear 4 lines simultaneously (this move called *Tetris*).
+3. line sents = 4 if you clear 2 lines with *T-spin*. 
+4. The player can get the additional sents by consecutive eliminating lines, and this behavior is called *combo*. The player can get bonus 1 / 2 / 3 / 4 sents by 1 ~ 2 / 3 ~ 4 / 5 ~ 6 / > 7 combos. 
+5. If the player use T-spin or Tetrix in this turn, he will get the *back to back* flag. When the next turn he also uses T-spin or Tetrix, he can get 2 bonus sents. The flag will disappear after a normal elimination. 
+
 ## Requirements
 
 - Python3<br/>
@@ -29,11 +37,17 @@ To reproduce the results, follow the steps below,
 2. Train the RL agent with PPO algorithm: <br/>
 `bash train_two_blocks.sh`.
 
-This model uses raw screenshot as inputs and resized the input to 224 * 224.
+This model uses raw screenshot as inputs and resized the input to 224 * 224. The reward is defined as the sum of "line sents" and "number of cleared lines". 
 
 ## Experiments
 
 ### Two kinds of Tetriminos
+![learning curve of different skip frames](imgs/skip_comparison.png)
+
+The above figure is the learning curve of the agent. It shows that the agent can learn with only two kinds of Tetriminos. <br/>
+
+I also compare the results between different numbers of skipping frames. The results show that the agent learns fast with 4 skipping frames, while it learns stable with 0 skipping frames. The outcomes are reasonable due to there are few redundancies with 4 skipping frames, so the training is fast. On the other side, there might be some important frames are skipped, thus, the training becoming unstable.
+
 
 Watch the performance of the learned agent: https://www.youtube.com/watch?v=vrmX3c4WIl0
 
