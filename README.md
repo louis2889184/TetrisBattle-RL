@@ -4,7 +4,7 @@ This is about training a RL agent to master once popular game -- Tetris Battle. 
 
 The challenge of mastering Tetris Battle: <br/>
 1. It's hard to eliminate lines via random actions, so rewards are sparse. <br/>
-2. The inputs are 600 x 800 images. (very big!) <br/>
+2. The inputs are 600 * 800 images. (very big!) <br/>
 
 Due to above challenges, the training is not successful by directly applying the algorithms in [1]. Therefore, I try to reduce the complexity of the games, and the concrete methods are<br/>
 1. Use observations with smaller dimension (the hidden grid of the game). <br/> 
@@ -20,7 +20,7 @@ other requirements: <br/>
 
 ## Usage
 
-### Two kinds of blocks
+### Two kinds of Tetriminos
 In this experiment, there are only I-shaped and O-shaped Tetriminos when playing. Under this setting, we can hugely reduce the complexity of the game and increase the probablity of the agent getting rewards.
 
 To reproduce the results, follow the steps below,
@@ -29,11 +29,11 @@ To reproduce the results, follow the steps below,
 2. Train the RL agent with PPO algorithm: <br/>
 `bash train_two_blocks.sh`.
 
-This model uses raw screenshot as inputs and resized the input to 224 $\times$ 224.
+This model uses raw screenshot as inputs and resized the input to 224 * 224.
 
 ## Experiments
 
-### Two kinds of blocks
+### Two kinds of Tetriminos
 
 Watch the performance of the learned agent: https://www.youtube.com/watch?v=vrmX3c4WIl0
 
