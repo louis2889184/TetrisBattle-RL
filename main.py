@@ -61,7 +61,8 @@ def main():
     device = torch.device("cuda:%d" % args.gpu if args.cuda else "cpu")
 
     envs = make_vec_envs(args.env_name, args.seed, args.num_processes,
-                         args.gamma, args.log_dir, device, False, 4, obs_type="grid" if args.grid else "image")
+                         args.gamma, args.log_dir, device, False, 4, 
+                         obs_type="grid" if args.grid else "image", skip_frames=args.num_skip_frames)
 
     actor_critic = Policy(
         envs.observation_space.shape,

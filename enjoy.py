@@ -32,6 +32,12 @@ parser.add_argument(
     action='store_true',
     default=False,
     help='whether to use a non-deterministic policy')
+parser.add_argument(
+    '--num_skip_frames',
+    type=int,
+    default=4,
+    help='how many frames to skip'
+)
 args = parser.parse_args()
 
 args.det = not args.non_det
@@ -44,7 +50,8 @@ env = make_vec_envs(
     None,
     device='cpu',
     allow_early_resets=False,
-    mode="rgb_array")
+    mode="human",
+    skip_frames=args.num_skip_frames)
 
 # Get a render function
 render_func = get_render_func(env)

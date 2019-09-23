@@ -1,3 +1,5 @@
 gym
 matplotlib
 pybullet
+pygame
+pytorch

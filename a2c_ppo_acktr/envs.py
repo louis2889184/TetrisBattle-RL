@@ -31,7 +31,7 @@ except ImportError:
     pass
 
 
-def make_env(env_id, seed, rank, log_dir, allow_early_resets, obs_type, mode):
+def make_env(env_id, seed, rank, log_dir, allow_early_resets, obs_type, mode, skip_frames):
     def _thunk():
         if env_id.startswith("dm"):
             _, domain, task = env_id.split('.')
@@ -54,11 +54,11 @@ def make_env(env_id, seed, rank, log_dir, allow_early_resets, obs_type, mode):
         if str(env.__class__.__name__).find('TimeLimit') >= 0:
             env = TimeLimitMask(env)
 
-        if log_dir is not None:
-            env = bench.Monitor(
-                env,
-                os.path.join(log_dir, str(rank)),
-                allow_early_resets=allow_early_resets)
+        # if log_dir is not None:
+        #     env = bench.Monitor(
+        #         env,
+        #         os.path.join(log_dir, str(rank)),
+        #         allow_early_resets=allow_early_resets)
 
     
         if is_atari:
@@ -67,7 +67,7 @@ def make_env(env_id, seed, rank, log_dir, allow_early_resets, obs_type, mode):
         elif env_id.startswith("tetris"):
             # env = wrap_deepmind(env, episode_life=False, clip_rewards=False, frame_stack=False, scale=False)
             # env = NoopResetEnv(env, noop_max=30)
-            env = MaxAndSkipEnv(env, skip=8)
+            env = MaxAndSkipEnv(env, skip=skip_frames)
             # pass
             if obs_type == "image":
                 env = WarpFrame(env, 224, 224)
@@ -96,9 +96,10 @@ def make_vec_envs(env_name,
                   allow_early_resets,
                   num_frame_stack=None,
                   obs_type='image',
-                  mode='rgb_array'):
+                  mode='rgb_array',
+                  skip_frames=4):
     envs = [
-        make_env(env_name, seed, i, log_dir, allow_early_resets, obs_type, mode)
+        make_env(env_name, seed, i, log_dir, allow_early_resets, obs_type, mode, skip_frames)
         for i in range(num_processes)
     ]
 

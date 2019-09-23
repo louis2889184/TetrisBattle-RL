@@ -165,7 +165,13 @@ def get_args():
     parser.add_argument(
         '--postfix',
         type=str,
-        default='')
+        default='', help='the postfix added to the log\'s name')
+    parser.add_argument(
+        '--num_skip_frames',
+        type=int,
+        default=4,
+        help='how many frames to skip'
+    )
     args = parser.parse_args()
 
     args.cuda = not args.no_cuda and torch.cuda.is_available()
