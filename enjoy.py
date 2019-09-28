@@ -38,6 +38,12 @@ parser.add_argument(
     default=4,
     help='how many frames to skip'
 )
+parser.add_argument(
+    '--grid',
+    action='store_true',
+    default=False,
+    help='use grid feature for tetris battle, or use image'
+)
 args = parser.parse_args()
 
 args.det = not args.non_det
@@ -51,6 +57,7 @@ env = make_vec_envs(
     device='cpu',
     allow_early_resets=False,
     mode="human",
+    obs_type="grid" if args.grid else "image",
     skip_frames=args.num_skip_frames)
 
 # Get a render function
