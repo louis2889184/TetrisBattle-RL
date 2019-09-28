@@ -149,7 +149,7 @@ class Renderer(object):
         grid, nextpieces = tetris.grid, tetris.buffer.now_list
         for i in range(5): # 5 different pieces 
             pos = []
-            _type = nextpieces[i]._type
+            _type = nextpieces[i].block_type()
             b = nextpieces[i].now_block()
             for x in range(4):
                 for y in range(4): #same procedure as the drawhed function

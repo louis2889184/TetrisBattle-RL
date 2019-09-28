@@ -137,7 +137,7 @@ def main():
                 agent.optimizer.lr if args.algo == "acktr" else args.lr)
 
         explore = exploration_rate(j - learning_start, 'exp')
-
+        # print(j)
         for step in range(args.num_steps):
             # Sample actions
             with torch.no_grad():

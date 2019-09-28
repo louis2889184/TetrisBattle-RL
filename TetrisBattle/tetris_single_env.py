@@ -216,7 +216,16 @@ class TetrisSingleInterface:
         return ob
 
     def get_seen_grid(self):
-        return self.tetris_list[self.now_player]["tetris"].get_grid().reshape(GRID_DEPTH, GRID_WIDTH, 1)
+        grid_1 = self.tetris_list[self.now_player]["tetris"].get_grid()
+        grid_1[-1][-1] = self.time / MAX_TIME
+        # print(grid_1)
+        grid_2 = self.tetris_list[1 - self.now_player]["tetris"].get_grid()
+        grid_2[-1][-1] = self.time / MAX_TIME
+        grid_2.fill(0) # since only one player
+        grid = np.concatenate([grid_1, grid_2], axis=1)
+
+        return grid.reshape(grid.shape[0], grid.shape[1], 1)
+        # return self.tetris_list[self.now_player]["tetris"].get_grid().reshape(GRID_DEPTH, GRID_WIDTH, 1)
 
     def get_obs(self):
         if self._obs_type == "grid":
@@ -411,12 +420,14 @@ class TetrisSingleEnv(gym.Env):
 
         self.seed()
 
+        self.accum_rewards = 0
+
         if obs_type == "image":
             self.observation_space = spaces.Box(low=0, high=255, 
                 shape=self.game_interface.screen_size() + [3], dtype=np.uint8)
         elif obs_type == "grid":
-            self.observation_space = spaces.Box(low=0, high=255, 
-                shape=list(self.game_interface.get_seen_grid().shape), dtype=np.uint8)
+            self.observation_space = spaces.Box(low=0, high=1, 
+                shape=list(self.game_interface.get_seen_grid().shape), dtype=np.float32)
 
     def random_action(self):
         return self.game_interface.random_action()
@@ -435,6 +446,10 @@ class TetrisSingleEnv(gym.Env):
 
         ob, reward, end, infos = self.game_interface.act(action)
 
+        self.accum_rewards += reward
+
+        if end:
+            infos['episode'] = {'r': self.accum_rewards}
 
         # if len(infos) != 0:
         #     reward += infos['height_sum'] / 50 / 1000
@@ -448,6 +463,8 @@ class TetrisSingleEnv(gym.Env):
         return ob, reward, end, infos
 
     def reset(self):
+
+        self.accum_rewards = 0
         # Reset the state of the environment to an initial state
 
         ob = self.game_interface.reset()

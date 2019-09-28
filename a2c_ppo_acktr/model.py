@@ -246,11 +246,18 @@ class GridBase(NNBase):
         init_ = lambda m: init(m, nn.init.orthogonal_, lambda x: nn.init.
                                constant_(x, 0), nn.init.calculate_gain('relu'))
 
+        # self.main = nn.Sequential(
+        #     init_(nn.Conv2d(num_inputs, 32, 3, stride=2, padding=(7, 0))), nn.ReLU(),
+        #     init_(nn.Conv2d(32, 64, 3, stride=2)), nn.ReLU(),
+        #     init_(nn.Conv2d(64, 32, 3, stride=2)), nn.ReLU(), Flatten(),
+        #     init_(nn.Linear(32 * 3 * 3, hidden_size)), nn.ReLU())
+
         self.main = nn.Sequential(
-            init_(nn.Conv2d(num_inputs, 32, 3, stride=2, padding=(0, 5))), nn.ReLU(),
-            init_(nn.Conv2d(32, 64, 3, stride=2)), nn.ReLU(),
-            init_(nn.Conv2d(64, 32, 3, stride=2)), nn.ReLU(), Flatten(),
-            init_(nn.Linear(32, hidden_size)), nn.ReLU())
+            Flatten(),
+            init_(nn.Linear(4 * 680, 1024)), nn.ReLU(),
+            init_(nn.Linear(1024, 256)), nn.ReLU(),
+            init_(nn.Linear(256, 64)), nn.ReLU(), 
+            init_(nn.Linear(64, hidden_size)), nn.ReLU())
 
         init_ = lambda m: init(m, nn.init.orthogonal_, lambda x: nn.init.
                                constant_(x, 0))
@@ -260,7 +267,10 @@ class GridBase(NNBase):
         self.train()
 
     def forward(self, inputs, rnn_hxs, masks):
-        x = self.main(inputs / 255.0)
+        # print(inputs.shape)
+        # print(inputs)
+        x = self.main(inputs)
+        # print(x.shape)
 
         if self.is_recurrent:
             x, rnn_hxs = self._forward_gru(x, rnn_hxs, masks)

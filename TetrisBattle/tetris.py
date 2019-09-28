@@ -663,20 +663,38 @@ class Tetris(object):
     
     def get_grid(self):
         excess = len(self.grid[0]) - GRID_DEPTH
-        return_grids = np.zeros(shape=(GRID_WIDTH, GRID_DEPTH), dtype=np.uint8)
+        return_grids = np.zeros(shape=(GRID_WIDTH, GRID_DEPTH), dtype=np.float32)
         
         block, px, py = self.block, self.px, self.py
         excess = len(self.grid[0]) - GRID_DEPTH
         b = block.now_block()
 
         for i in range(len(self.grid)):
-            return_grids[i] = np.array(self.grid[i][excess:GRID_DEPTH], dtype=np.uint8)
-        return_grids[return_grids > 0] = 255
+            return_grids[i] = np.array(self.grid[i][excess:GRID_DEPTH], dtype=np.float32)
+        return_grids[return_grids > 0] = 1
         for x in range(BLOCK_WIDTH):
             for y in range(BLOCK_LENGTH):
                 if b[x][y] > 0:
                     if -1 < px + x < 10 and -1 < py + y - excess < 20:
-                        return_grids[px + x][py + y - excess] = 122
+                        return_grids[px + x][py + y - excess] = 0.5
+
+        informations = np.zeros(shape=(len(PIECE_NUM2TYPE) - 1, GRID_DEPTH), dtype=np.float32)
+        if self.held != None:
+            informations[PIECE_TYPE2NUM[self.held.block_type()] - 1][0] = 1
+
+        nextpieces = self.buffer.now_list
+        for i in range(5): # 5 different pieces 
+            _type = nextpieces[i].block_type()
+            informations[PIECE_TYPE2NUM[_type] - 1][i + 1] = 1
+        # index start from 6
+
+        informations[0][6] = self.sent / 100
+        informations[1][6] = self.combo / 10
+        informations[2][6] = self.pre_back2back
+        informations[3][6] = self._attacked / GRID_DEPTH
+        # informations[3][7] = self.time / MAX_TIME
+
+        return_grids = np.concatenate((return_grids, informations), axis=0)
 
         return np.transpose(return_grids, (1, 0))
 
