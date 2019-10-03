@@ -698,6 +698,26 @@ class Tetris(object):
 
         return np.transpose(return_grids, (1, 0))
 
+    def get_board(self):
+        excess = len(self.grid[0]) - GRID_DEPTH
+        return_grids = np.zeros(shape=(GRID_WIDTH, GRID_DEPTH), dtype=np.float32)
+        
+        block, px, py = self.block, self.px, self.py
+        excess = len(self.grid[0]) - GRID_DEPTH
+        # b = block.now_block()
+
+        for i in range(len(self.grid)):
+            return_grids[i] = np.array(self.grid[i][excess:GRID_DEPTH], dtype=np.float32)
+        return_grids[return_grids > 0] = 1
+        # for x in range(BLOCK_WIDTH):
+        #     for y in range(BLOCK_LENGTH):
+        #         if b[x][y] > 0:
+        #             if -1 < px + x < 10 and -1 < py + y - excess < 20:
+        #                 return_grids[px + x][py + y - excess] = 0.5
+
+
+        return return_grids
+
     def get_maximum_height(self):
         max_height = 0
         for i in range(0, len(self.grid)):  # Select a column

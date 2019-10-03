@@ -172,6 +172,11 @@ def get_args():
         default=4,
         help='how many frames to skip'
     )
+    parser.add_argument(
+        '--load-dir',
+        default=None,
+        help='directory to save agent logs (default: None)')
+
     args = parser.parse_args()
 
     args.cuda = not args.no_cuda and torch.cuda.is_available()

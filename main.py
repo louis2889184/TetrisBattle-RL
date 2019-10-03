@@ -64,11 +64,19 @@ def main():
                          args.gamma, args.log_dir, device, False, 4, 
                          obs_type="grid" if args.grid else "image", skip_frames=args.num_skip_frames)
 
-    actor_critic = Policy(
-        envs.observation_space.shape,
-        envs.action_space,
-        base="grid" if args.grid else None,
-        base_kwargs={'recurrent': args.recurrent_policy})
+    if args.load_dir != None:
+        actor_critic, ob_rms = \
+                torch.load(os.path.join(args.load_dir), map_location=lambda storage, loc: storage)
+        vec_norm = utils.get_vec_normalize(envs)
+        if vec_norm is not None:
+            vec_norm.ob_rms = ob_rms
+        print("load pretrained...")
+    else:
+        actor_critic = Policy(
+            envs.observation_space.shape,
+            envs.action_space,
+            base="grid" if args.grid else None,
+            base_kwargs={'recurrent': args.recurrent_policy})
     actor_critic.to(device)
 
     if args.algo == 'a2c':

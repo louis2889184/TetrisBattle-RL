@@ -4,7 +4,15 @@ import re
 import numpy as np
 import matplotlib.pyplot as plt
 
-names = ['logs/tetris_single_ppo_IOL']
+names = [
+        # 'logs/tetris_single_ppo_skip4_grid_large',
+        #  'logs/tetris_single_ppo_skip4_grid_large_num8',
+        #  'logs/tetris_single_ppo_skip4_grid_large_num128',]
+        #  'logs/tetris_single_ppo_skip4_grid_large_mini32',]
+        #  'logs/tetris_single_ppo_skip4_grid_large_ent0',]
+        #  'logs/tetris_single_ppo_skip1_grid_large',]
+         'logs/tetris_single_ppo_skip8_grid_linear',
+         'logs/tetris_single_ppo_skip8_grid_large']
 
 rewards = []
 line_sents = []
@@ -46,25 +54,33 @@ for i, name in enumerate(names):
 
 styles = [':', '-']
 
+colors = ['b', 'g', 'r', 'c', 'm', 'y', 'k', 'w'] 
+
 fig, ax1 = plt.subplots()
 
-color = 'tab:red'
 ax1.set_xlabel('iterations')
-ax1.set_ylabel('rewards', color=color)
+ax1.set_ylabel('rewards')
 
 for i, name in enumerate(names):
-    ax1.plot(iterations[i], rewards[i], color=color, linestyle=styles[i], label=name)
-ax1.tick_params(axis='y', labelcolor=color)
+    ax1.plot(iterations[i], rewards[i], color=colors[i], label=name)
+# ax1.tick_params(axis='y', labelcolor=color)
 
-ax2 = ax1.twinx()  # instantiate a second axes that shares the same x-axis
-
-color = 'tab:blue'
-ax2.set_ylabel('line_sents', color=color)  # we already handled the x-label with ax1
-for i, name in enumerate(names):
-    # print(line_sents[i])
-    ax2.plot(iterations[i], line_sents[i], color=color, linestyle=styles[i], label=name)
-ax2.tick_params(axis='y', labelcolor=color)
 plt.legend()
 fig.tight_layout()  # otherwise the right y-label is slightly clipped
 
-plt.savefig("fig.png")
+plt.savefig("rewards.png")
+
+fig, ax2 = plt.subplots()
+
+# ax2 = ax1.twinx()  # instantiate a second axes that shares the same x-axis
+
+color = 'tab:blue'
+ax2.set_ylabel('line_sents')  # we already handled the x-label with ax1
+for i, name in enumerate(names):
+    # print(line_sents[i])
+    ax2.plot(iterations[i], line_sents[i], color=colors[i], label=name)
+
+plt.legend()
+fig.tight_layout()  # otherwise the right y-label is slightly clipped
+
+plt.savefig("line.png")

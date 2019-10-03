@@ -193,6 +193,11 @@ class TetrisSingleInterface:
         self.timer2p = pygame.time.Clock() # this will be used for counting down time in our game
 
         self.total_reward = 0
+        self.last_infos = {'height_sum': 0, 
+                           'diff_sum': 0,
+                           'max_height': 0,
+                           'holes': 0, 
+                           'n_used_block': 0}
 
     @property 
     def action_meaning(self):
@@ -333,20 +338,27 @@ class TetrisSingleInterface:
 
         ob = self.get_obs()
 
-        # height_sum, diff_sum, max_height, holes = get_infos(self.get_seen_grid())
+        if tetris.is_fallen:
+            height_sum, diff_sum, max_height, holes = get_infos(tetris.get_board())
 
-        # if self.tetris.is_fallen:
-        #     infos = {'height_sum': height_sum, 
-        #              'diff_sum': diff_sum,
-        #              'max_height': max_height,
-        #              'holes': holes, 
-        #              'n_used_block': tetris.n_used_block}
-        # else:
-        infos = {}
+            # store the different of each information due to this move
+            infos = {'height_sum': height_sum - self.last_infos['height_sum'] - 4, 
+                     'diff_sum': diff_sum - self.last_infos['diff_sum'],
+                     'max_height': max_height - self.last_infos['max_height'],
+                     'holes': holes - self.last_infos['holes'], 
+                     'n_used_block': tetris.n_used_block - self.last_infos['n_used_block']}
+            
+            self.last_infos = {'height_sum': height_sum,
+                               'diff_sum': diff_sum,
+                               'max_height': max_height,
+                               'holes': holes,
+                               'n_used_block': tetris.n_used_block}
+        else:
+            infos = {}
 
         if end:
             # freeze(0.5)
-            infos = {'sent': tetris.sent}
+            infos['sent'] = tetris.sent
             # self.reset()
 
         return ob, scores, end, infos
@@ -357,6 +369,11 @@ class TetrisSingleInterface:
         self.time = MAX_TIME
         self.now_player = random.randint(0, self.num_players - 1)
         self.total_reward = 0
+        self.last_infos = {'height_sum': 0, 
+                           'diff_sum': 0,
+                           'max_height': 0,
+                           'holes': 0,
+                           'n_used_block': 0}
         for i, player in enumerate(self.tetris_list):
             if i + 1 > self.num_players:
                 break 
@@ -421,6 +438,7 @@ class TetrisSingleEnv(gym.Env):
         self.seed()
 
         self.accum_rewards = 0
+        self.infos = {}
 
         if obs_type == "image":
             self.observation_space = spaces.Box(low=0, high=255, 
@@ -445,6 +463,10 @@ class TetrisSingleEnv(gym.Env):
         # Execute one time step within the environment
 
         ob, reward, end, infos = self.game_interface.act(action)
+
+        # if 'height_sum' in infos:
+        #     # print(infos)
+        #     reward -= infos['height_sum'] * 0.2
 
         self.accum_rewards += reward
 
@@ -485,8 +507,6 @@ class TetrisSingleEnv(gym.Env):
         #     self.viewer.imshow(img)
 
         #     return self.viewer.isopen
-
-
 
 if __name__ == "__main__":
     # play()
