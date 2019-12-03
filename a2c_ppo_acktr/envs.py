@@ -13,7 +13,7 @@ from baselines.common.vec_env.shmem_vec_env import ShmemVecEnv
 from baselines.common.vec_env.vec_normalize import \
     VecNormalize as VecNormalize_
 
-from TetrisBattle.tetris_single_env import TetrisSingleEnv
+from TetrisBattle.envs.tetris_env import TetrisSingleEnv
 
 try:
     import dm_control2gym
