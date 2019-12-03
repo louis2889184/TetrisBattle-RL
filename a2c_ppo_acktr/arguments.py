@@ -167,7 +167,7 @@ def get_args():
         type=str,
         default='', help='the postfix added to the log\'s name')
     parser.add_argument(
-        '--num_skip_frames',
+        '--num-skip-frames',
         type=int,
         default=4,
         help='how many frames to skip'

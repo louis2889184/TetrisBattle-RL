@@ -168,6 +168,7 @@ def main():
             
             # im = Image.fromarray(obs[0].reshape(224 * 4, -1).cpu().numpy().astype(np.uint8))
             # im.save("samples/%d.png" % kk)
+            # kk += 1
             # info = infos[0]
             # if len(info) > 0:
             #     print(info)

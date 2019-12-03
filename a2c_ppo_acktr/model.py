@@ -246,18 +246,18 @@ class GridBase(NNBase):
         init_ = lambda m: init(m, nn.init.orthogonal_, lambda x: nn.init.
                                constant_(x, 0), nn.init.calculate_gain('relu'))
 
-        # self.main = nn.Sequential(
-        #     init_(nn.Conv2d(num_inputs, 32, 6, stride=4, padding=(7, 0))), nn.ReLU(),
-        #     init_(nn.Conv2d(32, 64, 4, stride=2)), nn.ReLU(),
-        #     init_(nn.Conv2d(64, 32, 3, stride=2)), nn.ReLU(), Flatten(),
-        #     init_(nn.Linear(32, hidden_size)), nn.ReLU())
-
         self.main = nn.Sequential(
-            Flatten(),
-            init_(nn.Linear(4 * 680, 1024)), nn.ReLU(),
-            init_(nn.Linear(1024, 256)), nn.ReLU(),
-            init_(nn.Linear(256, 64)), nn.ReLU(), 
-            init_(nn.Linear(64, hidden_size)), nn.ReLU())
+            init_(nn.Conv2d(num_inputs, 8, 4, stride=2, padding=(7, 0))), nn.ReLU(),
+            init_(nn.Conv2d(8, 16, 4, stride=2)), nn.ReLU(),
+            init_(nn.Conv2d(16, 8, 3, stride=2)), nn.ReLU(), Flatten(),
+            init_(nn.Linear(8 * 3 * 3, hidden_size)), nn.ReLU())
+
+        # self.main = nn.Sequential(
+        #     Flatten(),
+        #     init_(nn.Linear(4 * 680, 1024)), nn.ReLU(),
+        #     init_(nn.Linear(1024, 256)), nn.ReLU(),
+        #     init_(nn.Linear(256, 64)), nn.ReLU(), 
+        #     init_(nn.Linear(64, hidden_size)), nn.ReLU())
 
         init_ = lambda m: init(m, nn.init.orthogonal_, lambda x: nn.init.
                                constant_(x, 0))
