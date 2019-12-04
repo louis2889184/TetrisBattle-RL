@@ -33,7 +33,7 @@ parser.add_argument(
     default=False,
     help='whether to use a non-deterministic policy')
 parser.add_argument(
-    '--num_skip_frames',
+    '--num-skip-frames',
     type=int,
     default=4,
     help='how many frames to skip'
